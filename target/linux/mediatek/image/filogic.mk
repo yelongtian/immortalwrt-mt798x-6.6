@@ -122,6 +122,23 @@ define Device/abt_asr3000
 endef
 TARGET_DEVICES += abt_asr3000
 
+define Device/honor_fur-602
+  DEVICE_VENDOR := Honor
+  DEVICE_MODEL := Fur-602
+  DEVICE_DTS := mt7981b-honor_fur-602
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGE_SIZE := 256384k
+  KERNEL_IN_UBI := 1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+endef
+TARGET_DEVICES += honor_fur-602
+
 define Device/acelink_ew-7886cax
   DEVICE_VENDOR := Acelink
   DEVICE_MODEL := EW-7886CAX
