@@ -20,7 +20,7 @@ detect_mtwifi() {
 					hwmode="11g"
 					htmode="HE40"
 					htbsscoex="1"
-					ssid="ImmortalWrt-2.4G"
+					ssid="CWRT-2.4G"
 					dbdc_main="1"
 					txpower="100"
 					channel="auto"
@@ -29,7 +29,7 @@ detect_mtwifi() {
 					hwmode="11a"
 					htmode="HE160"
 					htbsscoex="0"
-					ssid="ImmortalWrt-5G"
+					ssid="CWRT-5G"
 					channel="36"
 					txpower="100"
 					dbdc_main="0"
@@ -55,7 +55,9 @@ detect_mtwifi() {
 					set wireless.default_${dev}.network=lan
 					set wireless.default_${dev}.mode=ap
 					set wireless.default_${dev}.ssid=${ssid}
-					set wireless.default_${dev}.encryption=none
+					set wireless.default_${dev}.encryption='psk2+ccmp'
+					set wireless.default_${dev}.key='12345678'
+					set wireless.default_${dev}.key='12345678'
 EOF
 				uci -q commit wireless
 			}

@@ -69,6 +69,9 @@
 		reg = <0>;
 		phy-mode = "2500base-x";
 
+		nvmem-cells = <&macaddr_factory_24 0>;
+		nvmem-cell-names = "mac-address";
+
 		fixed-link {
 			speed = <2500>;
 			full-duplex;
@@ -252,16 +255,4 @@
 	nvmem-cells = <&eeprom_factory_0>;
 	nvmem-cell-names = "eeprom";
 	status = "okay";
-
-	band0: band@0 {
-		reg = <0>;
-		nvmem-cells = <&macaddr_factory_2a 1>;
-		nvmem-cell-names = "mac-address";
-	};
-
-	band1: band@1 {
-		reg = <1>;
-		nvmem-cells = <&macaddr_factory_2a 2>;
-		nvmem-cell-names = "mac-address";
-	};
 };
