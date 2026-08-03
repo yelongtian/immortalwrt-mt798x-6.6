@@ -2270,6 +2270,73 @@ static int mtk_bmt_init_nmbm(struct device_node *np)
 
 	bmtd.mtd->size = ni->data_block_count << bmtd.blk_shift;
 
+	/* ===== NMBM debug ===== */
+	{
+		int dbg_i;
+		pr_info("NMBM dbg: blk_cnt=%u data_cnt=%u mgmt_ba=%u sig_mgmt=%u info_sz=%u st_off=%u map_off=%u\n",
+			ni->block_count, ni->data_block_count, ni->mgmt_start_ba,
+			ni->signature.mgmt_start_pb, ni->info_table_size,
+			ni->info_table.state_table_off, ni->info_table.mapping_table_off);
+		pr_info("NMBM dbg: sig nand=0x%llx blk=0x%x pg=0x%x spare=0x%x\n",
+			ni->signature.nand_size, ni->signature.block_size,
+			ni->signature.page_size, ni->signature.spare_size);
+		for (dbg_i = 0; dbg_i < 10; dbg_i++)
+			pr_info("NMBM dbg: map[%d]=%d\n", dbg_i,
+				ni->block_mapping[dbg_i]);
+		for (dbg_i = 1885; dbg_i <= 1919; dbg_i++)
+			pr_info("NMBM dbg: map[%d]=%d\n", dbg_i,
+				ni->block_mapping[dbg_i]);
+
+		/* Read first 16 bytes at two candidate UBI offsets, both raw and NMBM-wrapped */
+		{
+			u8 dbg_raw[16], dbg_wrapped[16];
+			struct mtd_oob_ops ops;
+			int oi;
+			const u32 offs[2] = { 0x580000, 0x8a0000 };
+
+			for (oi = 0; oi < 2; oi++) {
+				/* 1) raw read (bypasses NMBM mapping) via bmtd._read_oob */
+				memset(&ops, 0, sizeof(ops));
+				ops.mode = MTD_OPS_PLACE_OOB;
+				ops.datbuf = dbg_raw;
+				ops.len = 16;
+				ops.oobbuf = NULL;
+				ops.ooblen = 0;
+				bmtd._read_oob(bmtd.mtd, offs[oi], &ops);
+
+				/* 2) NMBM-wrapped read (same path UBI uses) via mtd->_read_oob */
+				memset(&ops, 0, sizeof(ops));
+				ops.mode = MTD_OPS_PLACE_OOB;
+				ops.datbuf = dbg_wrapped;
+				ops.len = 16;
+				ops.oobbuf = NULL;
+				ops.ooblen = 0;
+				bmtd.mtd->_read_oob(bmtd.mtd, offs[oi], &ops);
+
+				pr_info("NMBM dbg: offs 0x%08x RAW:     %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x  (%c%c%c%c)\n",
+					offs[oi],
+					dbg_raw[0], dbg_raw[1], dbg_raw[2], dbg_raw[3],
+					dbg_raw[4], dbg_raw[5], dbg_raw[6], dbg_raw[7],
+					dbg_raw[8], dbg_raw[9], dbg_raw[10], dbg_raw[11],
+					dbg_raw[12], dbg_raw[13], dbg_raw[14], dbg_raw[15],
+					(dbg_raw[0] >= 0x20 && dbg_raw[0] < 0x7f) ? dbg_raw[0] : '.',
+					(dbg_raw[1] >= 0x20 && dbg_raw[1] < 0x7f) ? dbg_raw[1] : '.',
+					(dbg_raw[2] >= 0x20 && dbg_raw[2] < 0x7f) ? dbg_raw[2] : '.',
+					(dbg_raw[3] >= 0x20 && dbg_raw[3] < 0x7f) ? dbg_raw[3] : '.');
+				pr_info("NMBM dbg: offs 0x%08x WRAPPED: %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x  (%c%c%c%c)\n",
+					offs[oi],
+					dbg_wrapped[0], dbg_wrapped[1], dbg_wrapped[2], dbg_wrapped[3],
+					dbg_wrapped[4], dbg_wrapped[5], dbg_wrapped[6], dbg_wrapped[7],
+					dbg_wrapped[8], dbg_wrapped[9], dbg_wrapped[10], dbg_wrapped[11],
+					dbg_wrapped[12], dbg_wrapped[13], dbg_wrapped[14], dbg_wrapped[15],
+					(dbg_wrapped[0] >= 0x20 && dbg_wrapped[0] < 0x7f) ? dbg_wrapped[0] : '.',
+					(dbg_wrapped[1] >= 0x20 && dbg_wrapped[1] < 0x7f) ? dbg_wrapped[1] : '.',
+					(dbg_wrapped[2] >= 0x20 && dbg_wrapped[2] < 0x7f) ? dbg_wrapped[2] : '.',
+					(dbg_wrapped[3] >= 0x20 && dbg_wrapped[3] < 0x7f) ? dbg_wrapped[3] : '.');
+			}
+		}
+	}
+
 	return 0;
 
 out:
