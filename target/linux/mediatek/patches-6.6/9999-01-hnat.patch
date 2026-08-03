@@ -169,10 +169,11 @@ diff -u -r a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/
  			ret = -ENOMEM;
 --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c	2025-06-15 22:32:46.130001496 +0800
 +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c	2025-06-18 00:22:51.492001032 +0800
-@@ -39,11 +39,15 @@
+@@ -39,11 +39,16 @@
  #if defined(CONFIG_NET_MEDIATEK_HNAT) || defined(CONFIG_NET_MEDIATEK_HNAT_MODULE)
  #include "mtk_hnat/nf_hnat_mtk.h"
  #endif
+-
 +#include "mtk_eth_reset.h"
 +
 +static int mtk_wifi_num = 0;
