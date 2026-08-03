@@ -16,6 +16,9 @@
 #define MTK_WIFI_CHIP_OFFLINE 	0x2004
 #define MTK_FE_RESET_NAT_DONE	0x4001
 
+/* PPE CPU reason: force packet to CPU */
+#define HIT_BIND_FORCE_TO_CPU	0x16
+
 /* ADMA Rx Debug Monitor */
 #define MTK_ADMA_RX_DBG0	(PDMA_BASE + 0x238)
 #define MTK_ADMA_RX_DBG1	(PDMA_BASE + 0x23C)
